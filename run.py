@@ -3,8 +3,10 @@
 NOTES:
     https://hakibenita.com/timing-tests-in-python-for-fun-and-profit
 """
+import sys
 import time
 import unittest
+from subprocess import call
 from unittest import TextTestRunner
 from unittest.runner import TextTestResult
 
@@ -47,9 +49,28 @@ class TimeLoggingTestResult(TextTestResult):
     def getTestTimings(self):
         return self.test_timings
 
+
+class Check():
+    def __init__(self, name, cmd=['printf', 'this is the test check\\n']):
+        self.name = name
+        self.cmd = cmd
+
+    def run(self):
+        if not self.name:
+            call(self.cmd)
+        else:
+            call(['ag', 'input', './'+self.name+'.py'])
+            # call(["bat", "task_test.py"])
+
+
 if __name__ == '__main__':
+    if len(sys.argv) > 1:
+        task_name = sys.argv.pop()
+    else:
+        task_name = 'xxx'
+    checklist = [Check(task_name)]
+    for check in checklist:
+        print(check.run())
     # TODO: add argument parser, get module name
     test_runner = TimeLoggingTestRunner()
-    from subprocess import call
-    call(["bat", "task_test.py"])
     unittest.main(module='task_test', testRunner=test_runner)
